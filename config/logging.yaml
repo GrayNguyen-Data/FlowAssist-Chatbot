@@ -1,0 +1,53 @@
+# Cấu hình logging cho ứng dụng
+version: 1 
+
+# Log sẽ trông như thế này: "2024-06-01 12:00:00 - INFO - embedding - This is a log message"
+formatters: 
+  default:
+  # Trong đó: asctime là thời gian, levelname là mức độ log, name là tên logger, message là nội dung log
+    format: "[%(asctime)s] - %(levelname)s - %(name)s - %(message)s"
+    datefmt: "%Y-%m-%d %H:%M:%S"  # Định dạng lại asctime
+  
+  # Log sẽ được ghi ở đâu (console và file)
+  handlers:
+  # ghi log ra console
+    console:
+      class: logging.StreamHandler
+      formatter: default
+      level: INFO
+      stream: ext://sys.stdout # ghi log ra console
+    
+    # ghi log ra file
+    file:
+      class: logging.FileHandler
+      formatter: default
+      level: INFO
+      filename: logs/app.log  # Đường dẫn tới file log
+
+    # Cấu hình logger : Ai được quyền ghi log
+    loggers:
+      rag.ingestion:
+        level: DEBUG
+        handlers: [console, file]
+        propagate: no
+      rag.embedding:
+        level: DEBUG
+        handlers: [console, file]
+        propagate: no
+      rag.vectorstore:
+        level: DEBUG
+        handlers: [console, file]
+        propagate: no
+      rag.retrieval:
+        level: DEBUG
+        handlers: [console, file]
+        propagate: no
+      llm:
+        level: DEBUG
+        handlers: [console, file]
+        propagate: no
+    
+    # Cấu hình root logger
+    root:
+      level: INFO
+      handlers: [console, file]
