@@ -1,27 +1,48 @@
+import sys
+from pathlib import Path
 from sqlalchemy import create_engine, text
-import os
-from dotenv import load_dotenv
 
-# Load .env
-load_dotenv()
+# Add parent directory to path
+sys.path.insert(0, str(Path(__file__).parent.parent))
 
-DATABASE_URL = os.getenv("TIDB_DATABASE_URL")
+from core.setting_loader import load_settings
 
-if not DATABASE_URL:
-    raise ValueError("Không tìm thấy TIDB_DATABASE_URL trong .env")
+# Load settings from YAML with environment variables
+settings = load_settings("config/settings.yaml")
 
-print("DATABASE_URL loaded")
+print("Loading TiDB settings...")
 
-# Tạo engine
-engine = create_engine(
-    DATABASE_URL,
-    pool_pre_ping=True,
-)
+# Extract TiDB configuration
+tidb_config = settings["vector_store"]
+tidb_host = tidb_config["host"]
+tidb_port = int(tidb_config["port"])
+tidb_user = tidb_config["user"]
+tidb_password = tidb_config["password"]
+tidb_database = tidb_config["database"]
+tidb_timeout = int(tidb_config["timeout"])
 
+print(f"TiDB Host: {tidb_host}")
+print(f"TiDB Port: {tidb_port}")
+print(f"TiDB Database: {tidb_database}")
+
+# Build database URL
+database_url = f"mysql+pymysql://{tidb_user}:{tidb_password}@{tidb_host}:{tidb_port}/{tidb_database}?ssl_verify_cert=false"
+
+print("Connecting to TiDB...")
+
+# Create engine
 try:
+    engine = create_engine(
+        database_url,
+        pool_pre_ping=True,
+        connect_args={"read_timeout": tidb_timeout, "write_timeout": tidb_timeout}
+    )
+    
     with engine.connect() as conn:
         result = conn.execute(text("SELECT 1"))
-        print("CONNECT TiDB THÀNH CÔNG:", result.scalar())
+        print(f"✓ CONNECT TiDB THÀNH CÔNG: {result.scalar()}")
+        print(f"✓ Host: {tidb_host}:{tidb_port}")
+        print(f"✓ Database: {tidb_database}")
 except Exception as e:
-    print("CONNECT FAIL")
-    print(e)
+    print(f"✗ CONNECT FAIL")
+    print(f"Error: {e}")
