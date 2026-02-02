@@ -1,0 +1,223 @@
+{
+  "khoa": {
+    "ma_khoa": "CNTT",
+    "ten_khoa": "Công nghệ Thông tin",
+    "truong_khoa": {
+      "ho_ten": "Lê Văn Vinh",
+      "hoc_vi": "Tiến sĩ",
+      "chuc_danh": "Giảng viên cao cấp",
+      "email": "vinhlv@hcmute.edu.vn"
+    },
+    "bo_mon": [
+      {
+        "ma_bo_mon": "HTTT",
+        "ten_bo_mon": "Hệ thống Thông tin",
+        "truong_bo_mon": "Nguyễn Thanh Tuấn",
+        "pho_bo_mon": "Lê Thị Minh Châu",
+        "giang_vien": [
+          {
+            "ma_gv": "GV_HTTT_01",
+            "ho_ten": "Nguyễn Thanh Tuấn",
+            "hoc_vi": "Tiến sĩ",
+            "chuc_danh": "Giảng viên chính",
+            "chuc_vu": "Trưởng bộ môn",
+            "email": "tuannt@hcmute.edu.vn",
+            "huong_nghien_cuu": [
+              "Hệ thống thông tin doanh nghiệp",
+              "Chuyển đổi số",
+              "ERP"
+            ],
+            "mon_giang_day": [
+              "Hệ thống thông tin quản lý",
+              "Phân tích và thiết kế hệ thống"
+            ],
+            "bai_bao_khoa_hoc": [
+              {
+                "tieu_de": "A Framework for Digital Transformation in Vietnamese Enterprises",
+                "nam": 2022,
+                "tap_chi_hoi_nghi": "Journal of Information Systems Engineering",
+                "chi_so": "Scopus Q2"
+              },
+              {
+                "tieu_de": "ERP Adoption Factors in Small and Medium Enterprises",
+                "nam": 2020,
+                "tap_chi_hoi_nghi": "International Conference on Information Management",
+                "chi_so": "IEEE"
+              }
+            ]
+          },
+          {
+            "ma_gv": "GV_HTTT_02",
+            "ho_ten": "Lê Thị Minh Châu",
+            "hoc_vi": "Thạc sĩ",
+            "chuc_danh": "Giảng viên",
+            "chuc_vu": "Phó bộ môn",
+            "email": "chaultm@hcmute.edu.vn",
+            "huong_nghien_cuu": [
+              "Hệ thống thông tin",
+              "Phân tích nghiệp vụ"
+            ],
+            "mon_giang_day": [
+              "Phân tích yêu cầu phần mềm",
+              "Quản lý dự án CNTT"
+            ],
+            "bai_bao_khoa_hoc": [
+              {
+                "tieu_de": "Business Process Modeling in Information Systems Education",
+                "nam": 2021,
+                "tap_chi_hoi_nghi": "Vietnam Journal of Computer Science",
+                "chi_so": "ISSN"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "ma_bo_mon": "CNPM",
+        "ten_bo_mon": "Công nghệ Phần mềm",
+        "truong_bo_mon": "Huỳnh Xuân Phụng",
+        "pho_bo_mon": "Trương Thị Ngọc Phượng",
+        "giang_vien": [
+          {
+            "ma_gv": "GV_CNPM_01",
+            "ho_ten": "Huỳnh Xuân Phụng",
+            "hoc_vi": "Tiến sĩ",
+            "chuc_danh": "Giảng viên",
+            "chuc_vu": "Trưởng bộ môn",
+            "email": "phunghx@hcmute.edu.vn",
+            "huong_nghien_cuu": [
+              "Kỹ nghệ phần mềm",
+              "DevOps",
+              "Agile"
+            ],
+            "mon_giang_day": [
+              "Công nghệ phần mềm",
+              "Quy trình phát triển phần mềm"
+            ],
+            "bai_bao_khoa_hoc": [
+              {
+                "tieu_de": "Applying Agile Methodologies in Software Engineering Education",
+                "nam": 2023,
+                "tap_chi_hoi_nghi": "Education and Information Technologies",
+                "chi_so": "Scopus Q1"
+              }
+            ]
+          },
+          {
+            "ma_gv": "GV_CNPM_07",
+            "ho_ten": "Phùng Quang Ngọc",
+            "hoc_vi": "Tiến sĩ",
+            "chuc_danh": "Giảng viên",
+            "chuc_vu": "",
+            "email": "ngocpq@hcmute.edu.vn",
+            "huong_nghien_cuu": [
+              "Kiểm thử phần mềm",
+              "Đảm bảo chất lượng"
+            ],
+            "mon_giang_day": [
+              "Kiểm thử phần mềm",
+              "Đảm bảo chất lượng phần mềm"
+            ],
+            "bai_bao_khoa_hoc": [
+              {
+                "tieu_de": "Automated Testing Strategies for Web Applications",
+                "nam": 2021,
+                "tap_chi_hoi_nghi": "International Journal of Software Testing",
+                "chi_so": "Scopus Q3"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "ma_bo_mon": "ANM",
+        "ten_bo_mon": "An ninh mạng",
+        "truong_bo_mon": "Nguyễn Thị Thanh Vân",
+        "pho_bo_mon": "Đinh Công Đoan",
+        "giang_vien": [
+          {
+            "ma_gv": "GV_ANM_01",
+            "ho_ten": "Nguyễn Thị Thanh Vân",
+            "hoc_vi": "Thạc sĩ",
+            "chuc_danh": "Giảng viên cao cấp",
+            "chuc_vu": "Trưởng bộ môn",
+            "email": "vanntth@hcmute.edu.vn",
+            "huong_nghien_cuu": [
+              "An toàn thông tin",
+              "Mã hóa dữ liệu"
+            ],
+            "mon_giang_day": [
+              "An ninh mạng",
+              "Mật mã học"
+            ],
+            "bai_bao_khoa_hoc": [
+              {
+                "tieu_de": "Data Encryption Techniques for Secure Network Systems",
+                "nam": 2020,
+                "tap_chi_hoi_nghi": "Journal of Cyber Security",
+                "chi_so": "Scopus Q2"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "ma_bo_mon": "AI",
+        "ten_bo_mon": "Trí tuệ Nhân tạo",
+        "truong_bo_mon": "Phan Thị Huyền Trang",
+        "pho_bo_mon": "Quách Đình Hoàng",
+        "giang_vien": [
+          {
+            "ma_gv": "GV_AI_01",
+            "ho_ten": "Phan Thị Huyền Trang",
+            "hoc_vi": "Tiến sĩ",
+            "chuc_danh": "Giảng viên",
+            "chuc_vu": "Trưởng bộ môn",
+            "email": "trangpth@hcmute.edu.vn",
+            "huong_nghien_cuu": [
+              "Học sâu",
+              "Xử lý ảnh",
+              "Thị giác máy tính"
+            ],
+            "mon_giang_day": [
+              "Trí tuệ nhân tạo",
+              "Học máy"
+            ],
+            "bai_bao_khoa_hoc": [
+              {
+                "tieu_de": "Deep Learning-Based Image Classification for Smart Cities",
+                "nam": 2023,
+                "tap_chi_hoi_nghi": "IEEE Access",
+                "chi_so": "SCI-E"
+              }
+            ]
+          },
+          {
+            "ma_gv": "GV_AI_04",
+            "ho_ten": "Hoàng Văn Dũng",
+            "hoc_vi": "PGS.TS",
+            "chuc_danh": "Giảng viên cao cấp",
+            "chuc_vu": "Phó trưởng khoa",
+            "email": "dunghv@hcmute.edu.vn",
+            "huong_nghien_cuu": [
+              "Trí tuệ nhân tạo",
+              "Khai phá dữ liệu"
+            ],
+            "mon_giang_day": [
+              "Khai phá dữ liệu",
+              "Hệ chuyên gia"
+            ],
+            "bai_bao_khoa_hoc": [
+              {
+                "tieu_de": "Data Mining Techniques for Large-Scale Educational Data",
+                "nam": 2019,
+                "tap_chi_hoi_nghi": "Knowledge-Based Systems",
+                "chi_so": "Scopus Q1"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

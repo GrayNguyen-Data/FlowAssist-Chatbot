@@ -5,7 +5,7 @@ app:
   log_level: ${LOG_LEVEL}
 
 data:
-  raw_dir: data/raw_data
+  raw_dir: data
   processed_dir: data/processed_data
   schema_dir: data/schema
 
@@ -45,4 +45,14 @@ llm:
 security:
   max_query_length: ${MAX_QUERY_LENGTH}
   rate_limit_per_minute: ${RATE_LIMIT_PER_MINUTE}   
+
+
+minio:
+  minio_username: ${MINIO_ROOT_USER}
+  minio_password: ${MINIO_ROOT_PASSWORD}
+  minio_endpoint: ${MINIO_ENDPOINT}
+  minio_bucket_name: ${MINIO_BUCKET_NAME}
+  
+
+
 

@@ -1,10 +1,17 @@
+from pathlib import Path
 import os
 import yaml
+from dotenv import load_dotenv
+
+BASE_DIR = Path(__file__).resolve().parent.parent
+load_dotenv(BASE_DIR / ".env")
+
+CONFIG_PATH = BASE_DIR / "config" / "settings.yaml"
+
 
 def load_settings():
-
     # Load YAML settings
-    with open("config/settings.yaml", "r") as file:
+    with open(CONFIG_PATH, "r", encoding="utf-8") as file:
         settings = yaml.safe_load(file)
 
     # ===== Application Configuration =====
@@ -72,8 +79,24 @@ def load_settings():
         settings["security"]["max_query_length"] = int(os.getenv("MAX_QUERY_LENGTH"))
     if os.getenv("RATE_LIMIT_PER_MINUTE"):
         settings["security"]["rate_limit_per_minute"] = int(os.getenv("RATE_LIMIT_PER_MINUTE"))
+
+    # ===== MinIO Configuration =====
+    if os.getenv("MINIO_ROOT_USER"):
+        settings["minio"]["minio_username"] = os.getenv("MINIO_ROOT_USER")
+    if os.getenv("MINIO_ROOT_PASSWORD"):
+        settings["minio"]["minio_password"] = os.getenv("MINIO_ROOT_PASSWORD")
+    if os.getenv("MINIO_ENDPOINT"):
+        settings["minio"]["minio_endpoint"] = os.getenv("MINIO_ENDPOINT")
+    if os.getenv("MINIO_BUCKET_NAME"):
+        settings["minio"]["minio_bucket_name"] = os.getenv("MINIO_BUCKET_NAME")
     
     return settings
+
+# ===== Cấu hình MinIO =====
+MINIO_ENDPOINT = os.getenv("MINIO_ENDPOINT")
+MINIO_USERNAME = os.getenv("MINIO_ROOT_USER")
+MINIO_PASSWORD = os.getenv("MINIO_ROOT_PASSWORD")
+MINIO_BUCKET_NAME = os.getenv("MINIO_BUCKET_NAME")
 
 
 if __name__ == "__main__":
