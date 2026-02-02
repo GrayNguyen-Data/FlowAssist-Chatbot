@@ -1,81 +1,70 @@
-from minio import Minio, S3Error
-from pathlib import Path 
-from datetime import datetime
-import dotenv
-from dotenv import load_dotenv
-import os
-import mimetypes
-load_dotenv()
-
-# ====== Đường dẫn của dự án ======
+from minio import Minio
 from pathlib import Path
+from datetime import datetime
+import mimetypes
 
-# BASE_DIR là thư mục gốc của dự án
+from core.setting_loader import load_settings
+
+# ===== Load settings =====
+settings = load_settings()
+
+# ===== Paths =====
 BASE_DIR = Path(__file__).resolve().parent.parent
-# DATA_DIR là thư mục con "data" nằm trong dự án
-DATA_DIR = BASE_DIR / "data"
+RAW_DATA_DIR = BASE_DIR / settings["data"]["raw_dir"]
 
+# ===== MinIO config =====
+minio_cfg = settings["minio"]
+MINIO_BUCKET_NAME = minio_cfg["minio_bucket_name"]
 
-# ===== Cấu hình MinIO =====
-MINIO_ENDPOINT = os.getenv("MINIO_ENDPOINT")
-MINIO_USERNAME = os.getenv("MINIO_ROOT_USER")
-MINIO_PASSWORD = os.getenv("MINIO_ROOT_PASSWORD")
-MINIO_BUCKET_NAME = os.getenv("MINIO_BUCKET_NAME")
-
-# ===== Khởi tạo MinIO Client =====
+# ===== Create MinIO Client =====
 def create_minio_client() -> Minio:
     return Minio(
-        MINIO_ENDPOINT,
-        access_key=MINIO_USERNAME,
-        secret_key=MINIO_PASSWORD,
-        secure=False)
+        minio_cfg["minio_endpoint"],
+        access_key=minio_cfg["minio_username"],
+        secret_key=minio_cfg["minio_password"],
+        secure=False,
+    )
 
-# ===== Kiểm tra và tạo bucket nếu chưa tồn tại =====
-def check_bucket(minio_client: Minio, bucket_name: str):
-    if not minio_client.bucket_exists(bucket_name):
-        minio_client.make_bucket(bucket_name)
-    else:
-        print(f"Bucket '{bucket_name}' already exists.")
+# ===== Check bucket =====
+def check_bucket(client: Minio, bucket_name: str):
+    if not client.bucket_exists(bucket_name):
+        client.make_bucket(bucket_name)
+        print(f"Created bucket: {bucket_name}")
 
-# ===== Tải tệp lên MinIO =====
-def upload_raw_data_to_minio(client: Minio, base_dir: Path):
+# ===== Upload raw data =====
+def upload_raw_data(client: Minio, base_dir: Path):
     if not base_dir.exists():
-        raise FileNotFoundError(f"Directory {base_dir} does not exist.")
+        raise FileNotFoundError(f"Directory not found: {base_dir}")
 
     for file_path in base_dir.rglob("*"):
-        if file_path.is_file():
-            # Lấy đường dẫn tương đối từ DATA_DIR
-            relative_path = file_path.relative_to(base_dir)
-            # Thêm prefix raw_data/
-            object_name = f"raw_data/{relative_path}".replace("\\", "/")
+        if not file_path.is_file():
+            continue
 
-            content_type, _ = mimetypes.guess_type(file_path)
-            content_type = content_type or "application/octet-stream"
+        relative_path = file_path.relative_to(base_dir)
+        object_name = f"raw_data/{relative_path}".replace("\\", "/")
 
-            metadata = {
-                "source": "internal",
-                "uploaded_at": datetime.now().strftime("%d-%m-%Y %H:%M:%S"),
-                "file_type": file_path.suffix.replace(".", "")
-            }
+        content_type, _ = mimetypes.guess_type(file_path)
+        content_type = content_type or "application/octet-stream"
 
-            client.fput_object(
-                bucket_name=MINIO_BUCKET_NAME,
-                object_name=object_name,
-                file_path=str(file_path),
-                content_type=content_type,
-                metadata=metadata
-            )
+        metadata = {
+            "source": "internal",
+            "uploaded_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+            "file_type": file_path.suffix.lstrip("."),
+        }
 
-            print(f"Uploaded: {object_name}")
+        client.fput_object(
+            bucket_name=MINIO_BUCKET_NAME,
+            object_name=object_name,
+            file_path=str(file_path),
+            content_type=content_type,
+            metadata=metadata,
+        )
 
+        print(f"Uploaded: {object_name}")
 
-# =====================
-# Main
-# =====================
+# ===== Entry point =====
 def main():
     client = create_minio_client()
     check_bucket(client, MINIO_BUCKET_NAME)
-    upload_raw_data_to_minio(client, DATA_DIR)
-    print("Upload toàn bộ thư mục hoàn tất!")
-
-
+    upload_raw_data(client, RAW_DATA_DIR)
+    print("✅ Upload raw_data hoàn tất")
