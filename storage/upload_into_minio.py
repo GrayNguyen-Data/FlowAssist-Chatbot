@@ -38,13 +38,17 @@ def check_bucket(minio_client: Minio, bucket_name: str):
         print(f"Bucket '{bucket_name}' already exists.")
 
 # ===== Tải tệp lên MinIO =====
-def upload_file_to_minio(client: Minio, base_dir:Path):
+def upload_raw_data_to_minio(client: Minio, base_dir: Path):
     if not base_dir.exists():
         raise FileNotFoundError(f"Directory {base_dir} does not exist.")
 
     for file_path in base_dir.rglob("*"):
         if file_path.is_file():
-            object_name = str(file_path.relative_to(base_dir)).replace("\\", "/")
+            # Lấy đường dẫn tương đối từ DATA_DIR
+            relative_path = file_path.relative_to(base_dir)
+            # Thêm prefix raw_data/
+            object_name = f"raw_data/{relative_path}".replace("\\", "/")
+
             content_type, _ = mimetypes.guess_type(file_path)
             content_type = content_type or "application/octet-stream"
 
@@ -64,13 +68,14 @@ def upload_file_to_minio(client: Minio, base_dir:Path):
 
             print(f"Uploaded: {object_name}")
 
+
 # =====================
 # Main
 # =====================
 def main():
     client = create_minio_client()
     check_bucket(client, MINIO_BUCKET_NAME)
-    upload_file_to_minio(client, DATA_DIR)
+    upload_raw_data_to_minio(client, DATA_DIR)
     print("Upload toàn bộ thư mục hoàn tất!")
 
 
