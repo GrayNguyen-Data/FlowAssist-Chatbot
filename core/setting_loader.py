@@ -90,6 +90,15 @@ def load_settings():
     if os.getenv("MINIO_BUCKET_NAME"):
         settings["minio"]["minio_bucket_name"] = os.getenv("MINIO_BUCKET_NAME")
     
+    # ===== Minio =======
+    if os.getenv("MINIO_ENDPOINT"):
+        settings['minio']['minio_endpoint'] = os.getenv("MINIO_ENDPOINT")
+    if os.getenv("MINIO_ROOT_USER"):
+        settings['minio']['minio_username'] = os.getenv("MINIO_ROOT_USER")
+    if os.getenv("MINIO_ROOT_PASSWORD"):
+        settings['minio']['minio_password'] = os.getenv("MINIO_ROOT_PASSWORD")
+    if os.getenv("MINIO_BUCKET_NAME"):
+        settings['minio']['minio_bucket_name'] = os.getenv("MINIO_BUCKET_NAME")
     return settings
 
 # ===== Cấu hình MinIO =====
@@ -99,7 +108,3 @@ MINIO_PASSWORD = os.getenv("MINIO_ROOT_PASSWORD")
 MINIO_BUCKET_NAME = os.getenv("MINIO_BUCKET_NAME")
 
 
-if __name__ == "__main__":
-    settings = load_settings()
-    print("Settings loaded successfully:")
-    print(yaml.dump(settings, default_flow_style=False, allow_unicode=True))
