@@ -90,11 +90,15 @@ def load_settings():
     if os.getenv("MINIO_BUCKET_NAME"):
         settings["minio"]["minio_bucket_name"] = os.getenv("MINIO_BUCKET_NAME")
     
+    # ===== Config Groq =====
+    if os.getenv("API_KEY_GROQ"):
+        settings['groq']['groq_api_key'] = os.getenv("API_KEY_GROQ")
+    
+
+    # ===== Config OpenAl =====
+    if os.getenv("OPENAl_API_KEY"):
+        settings['openai']['openai_api_key'] = os.getenv("OPENAl_API_KEY")
+        
     return settings
 
-# ===== Cấu hình MinIO =====
-MINIO_ENDPOINT = os.getenv("MINIO_ENDPOINT")
-MINIO_USERNAME = os.getenv("MINIO_ROOT_USER")
-MINIO_PASSWORD = os.getenv("MINIO_ROOT_PASSWORD")
-MINIO_BUCKET_NAME = os.getenv("MINIO_BUCKET_NAME")
 

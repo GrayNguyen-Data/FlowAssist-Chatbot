@@ -53,6 +53,8 @@ minio:
   minio_endpoint: ${MINIO_ENDPOINT}
   minio_bucket_name: ${MINIO_BUCKET_NAME}
   
+groq:
+  groq_api_key: ${API_KEY_GROQ}
 
-
-
+openai:
+  openai_api_key: ${OPENAl_API_KEY}
