@@ -98,8 +98,3 @@ MINIO_USERNAME = os.getenv("MINIO_ROOT_USER")
 MINIO_PASSWORD = os.getenv("MINIO_ROOT_PASSWORD")
 MINIO_BUCKET_NAME = os.getenv("MINIO_BUCKET_NAME")
 
-
-if __name__ == "__main__":
-    settings = load_settings()
-    print("Settings loaded successfully:")
-    print(yaml.dump(settings, default_flow_style=False, allow_unicode=True))
