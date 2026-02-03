@@ -54,9 +54,9 @@ def process_pdf_from_minio(prefix: str = "raw_data/"):
 
 # summary nó nhờ vào model 
 
-# config prompt
+# config prompt cho table và text
 prompt_text = """
-You are an assistnt tasked with summarizing tables and text.
+You are an assist tasked with summarizing tables and text.
 Give a concise summary of the table or text.
 
 Respond only with the summary, no additional comment.
@@ -71,3 +71,5 @@ prompt = ChatPromptTemplate.from_template(prompt_text)
 # summary chain 
 model = ChatGroq(temperature=0.5, model = 'llama-3.1-8b-instant')
 summary_chain = {"element": lambda x: x} | prompt | model | StrOutputParser()
+
+
