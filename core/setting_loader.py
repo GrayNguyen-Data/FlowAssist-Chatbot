@@ -94,11 +94,6 @@ def load_settings():
     if os.getenv("API_KEY_GROQ"):
         settings['groq']['groq_api_key'] = os.getenv("API_KEY_GROQ")
     
-
-    # ===== Config OpenAl =====
-    if os.getenv("OPENAl_API_KEY"):
-        settings['openai']['openai_api_key'] = os.getenv("OPENAl_API_KEY")
-        
     return settings
 
 
