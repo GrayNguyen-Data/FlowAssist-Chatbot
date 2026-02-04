@@ -56,5 +56,4 @@ minio:
 groq:
   groq_api_key: ${API_KEY_GROQ}
 
-openai:
-  openai_api_key: ${OPENAl_API_KEY}
+
