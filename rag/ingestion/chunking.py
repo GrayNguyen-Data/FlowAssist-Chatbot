@@ -86,7 +86,6 @@ def get_chunks_from_pdf(file_buffer):
         extract_images_in_pdf=False,
         include_page_breaks=False,
     )
-
     return chunks
 # ======================================================
 # UPLOAD JSON DIRECTLY TO MINIO (NO TEMP FILE)
@@ -126,9 +125,7 @@ def process_all_pdfs():
             ch for ch in chunks
             if hasattr(ch, "text") and ch.text and ch.text.strip()
         ]
-
         print(f"Found {len(text_chunks)} text chunks")
-
         # =====================
         # 2. SUMMARY + STORE
         # =====================
@@ -137,11 +134,9 @@ def process_all_pdfs():
             summary = summary_chain.invoke({
                 "element": chunk.text
             })
-
             # record chuẩn cho RAG
             record = {
                 "id": str(uuid.uuid4()),
-
                 # ===== CONTENT (embed, rerank dùng)
                 "content": {
                     "text": chunk.text,
@@ -157,7 +152,6 @@ def process_all_pdfs():
                     "type": "text",
                 }
             }
-
 
             # path object trong bucket
             object_path = (

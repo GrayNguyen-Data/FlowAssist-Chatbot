@@ -3,12 +3,13 @@ from pathlib import Path
 from sqlalchemy import create_engine, text
 
 # Add parent directory to path
-sys.path.insert(0, str(Path(__file__).parent.parent))
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
+sys.path.insert(0, str(PROJECT_ROOT))
 
 from core.setting_loader import load_settings
 
 # Load settings from YAML with environment variables
-settings = load_settings("config/settings.yaml")
+settings = load_settings()
 
 print("Loading TiDB settings...")
 
@@ -28,21 +29,22 @@ print(f"TiDB Database: {tidb_database}")
 # Build database URL
 database_url = f"mysql+pymysql://{tidb_user}:{tidb_password}@{tidb_host}:{tidb_port}/{tidb_database}?ssl_verify_cert=false"
 
-print("Connecting to TiDB...")
 
-# Create engine
-try:
-    engine = create_engine(
-        database_url,
-        pool_pre_ping=True,
-        connect_args={"read_timeout": tidb_timeout, "write_timeout": tidb_timeout}
-    )
-    
-    with engine.connect() as conn:
-        result = conn.execute(text("SELECT 1"))
-        print(f"✓ CONNECT TiDB THÀNH CÔNG: {result.scalar()}")
-        print(f"✓ Host: {tidb_host}:{tidb_port}")
-        print(f"✓ Database: {tidb_database}")
-except Exception as e:
-    print(f"✗ CONNECT FAIL")
-    print(f"Error: {e}")
+def connect_tidb():
+    print("Connecting to TiDB...")
+    # Create engine
+    try:
+        engine = create_engine(
+            database_url,
+            pool_pre_ping=True,
+            connect_args={"read_timeout": tidb_timeout, "write_timeout": tidb_timeout}
+        )
+        
+        with engine.connect() as conn:
+            result = conn.execute(text("SELECT 1"))
+            print(f"CONNECT TiDB THÀNH CÔNG: {result.scalar()}")
+            print(f"Host: {tidb_host}:{tidb_port}")
+            print(f"Database: {tidb_database}")
+    except Exception as e:
+        print(f"CONNECT FAIL")
+        print(f"Error: {e}")
