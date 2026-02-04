@@ -1,105 +1,181 @@
-from unstructured.partition.pdf import partition_pdf
-from loader import get_raw_data_from_minio
-import sys
-from pathlib import Path
 import io
+import json
+import uuid
+import time
+from pathlib import Path
+from unstructured.partition.pdf import partition_pdf
+from minio import Minio
 from langchain_groq import ChatGroq
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import StrOutputParser
+
+# =========================
+# PROJECT UTILS
+# =========================
+from loader import get_raw_data_from_minio
 from core.setting_loader import load_settings
-import time 
-from langchain_openai import ChatOpenAl
 
-# ===== load env =====
-setting = load_settings()
-groq_config = setting['groq']
-groq_api_key = groq_config['groq_api_key']
+# ======================================================
+# LOAD CONFIG
+# ======================================================
+settings = load_settings()
+
+# ===== MinIO config =====
+minio_cfg = settings["minio"]
+MAIN_BUCKET = minio_cfg["minio_bucket_name"]
+
+RAW_PREFIX = "raw_data/"
+PROCESSED_PREFIX = "processed_data/"
+
+# ===== Groq config =====
+groq_cfg = settings["groq"]
+groq_api_key = groq_cfg["groq_api_key"]
 
 
-PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
-sys.path.insert(0, str(PROJECT_ROOT))
-# tách các phần của PDF Unsstructure -> text, img, table 
+# ======================================================
+# CREATE MINIO CLIENT
+# ======================================================
+def create_minio_client() -> Minio:
+    return Minio(
+        minio_cfg["minio_endpoint"],
+        access_key=minio_cfg["minio_username"],
+        secret_key=minio_cfg["minio_password"],
+        secure=False,
+    )
+minio_client = create_minio_client()
+
+# ======================================================
+# INIT LLM SUMMARY CHAIN
+# ======================================================
+SUMMARY_PROMPT = """
+You are an assistant tasked with summarizing text extracted from a PDF.
+Give a concise and clear summary.
+
+Respond ONLY with the summary.
+Text: {element}
+"""
+prompt = ChatPromptTemplate.from_template(SUMMARY_PROMPT)
+
+model = ChatGroq(
+    api_key=groq_api_key,
+    model="llama-3.1-8b-instant",
+    temperature=0.5,
+)
+
+summary_chain = prompt | model | StrOutputParser()
+
+# ======================================================
+# CHUNK PDF (RAM → RAM)
+# ======================================================
 def get_chunks_from_pdf(file_buffer):
+    # đọc PDF thành bytes
     pdf_bytes = file_buffer.read()
+
+    # tạo file-like object trong RAM
     pdf_io = io.BytesIO(pdf_bytes)
     pdf_io.seek(0)
-    
+
     chunks = partition_pdf(
         file=pdf_io,
-        strategy="hi_res",
+        strategy="hi_res",                 # layout-aware
         chunking_strategy="by_title",
         max_characters=1500,
         combine_text_under_n_chars=200,
         new_after_n_chars=2000,
-        extract_images_in_pdf=True,
         infer_table_structure=True,
+        extract_images_in_pdf=False,
         include_page_breaks=False,
     )
+
     return chunks
+# ======================================================
+# UPLOAD JSON DIRECTLY TO MINIO (NO TEMP FILE)
+# ======================================================
+def upload_json_to_minio(bucket: str, object_name: str, data: dict):
+    payload = json.dumps(data, ensure_ascii=False).encode("utf-8")
 
-def process_pdf_from_minio(prefix: str = "raw_data/"):
-    for object_name, file_buffer in get_raw_data_from_minio(prefix=prefix):
-        if object_name.endswith(".pdf"):
-            chunks = get_chunks_from_pdf(file_buffer)
+    minio_client.put_object(
+        bucket_name=bucket,
+        object_name=object_name,
+        data=io.BytesIO(payload),
+        length=len(payload),
+        content_type="application/json",
+    )
 
-            tables = []
-            texts = []
-            images_b64 = []
+# ======================================================
+# MAIN PIPELINE: PROCESS ALL PDF
+# ======================================================
+def process_all_pdfs():
+    for object_name, file_buffer in get_raw_data_from_minio(RAW_PREFIX):
 
-            for chunk in chunks:
-                if "CompositeElement" in str(type(chunk)):
-                    texts.append(chunk)
+        # chỉ xử lý PDF
+        if not object_name.lower().endswith(".pdf"):
+            continue
+        print(f"\nProcessing: {object_name}")
 
-                    if hasattr(chunk.metadata, "orig_elements"): # tức là kiểm tra xem orig_elements có trong chunk metadataa không
-                        for el in chunk.metadata.orig_elements:
-                            if "Table" in str(type(el)):
-                                tables.append(el)
+        # tên file không có .pdf
+        doc_id = Path(object_name).stem
 
-                            if "Image" in str(type(el)):
-                                images_b64.append(el.metadata.image_base64)
+        # =====================
+        # 1. CHUNK PDF
+        # =====================
+        chunks = get_chunks_from_pdf(file_buffer)
 
-            print(f"Found {len(tables)} tables")
-            print(f"Found {len(texts)} text chunks")
-            print(f"Found {len(images_b64)} images")
+        # chỉ lấy chunk có text
+        text_chunks = [
+            ch for ch in chunks
+            if hasattr(ch, "text") and ch.text and ch.text.strip()
+        ]
 
-            return tables, texts, images_b64
+        print(f"Found {len(text_chunks)} text chunks")
 
+        # =====================
+        # 2. SUMMARY + STORE
+        # =====================
+        for idx, chunk in enumerate(text_chunks):
+            # gọi LLM summary
+            summary = summary_chain.invoke({
+                "element": chunk.text
+            })
 
-# summary nó nhờ vào model 
+            # record chuẩn cho RAG
+            record = {
+                "id": str(uuid.uuid4()),
 
-# config prompt cho table và text
-prompt_text = """
-You are an assist tasked with summarizing tables and text.
-Give a concise summary of the table or text.
+                # ===== CONTENT (embed, rerank dùng)
+                "content": {
+                    "text": chunk.text,
+                    "summary": summary,
+                },
 
-Respond only with the summary, no additional comment.
-Do not start your message by saying "Here is a summary" or any thing like chat. 
-Just give the summary at it is.
-
-Table or text chunk: {element}
-"""
-
-prompt = ChatPromptTemplate.from_template(prompt_text)
-
-# summary chain 
-model = ChatGroq(
-    api_key=groq_api_key,
-    temperature=0.5,
-    model="llama-3.1-8b-instant"
-)
-summary_chain = prompt | model | StrOutputParser()
-
-
-def summary(elements, delay = 1.5):
-    results = []
-    for element in elements:
-        res = summary_chain.invoke({'element': element})
-        results.append(res)
-        time.sleep(delay)
-    return results
-
-# ==== Summary image ====
+                # ===== METADATA (filter, trace)
+                "metadata": {
+                    "doc_id": doc_id,
+                    "page": getattr(chunk.metadata, "page_number", None),
+                    "chunk_index": idx,
+                    "source": f"minio://{MAIN_BUCKET}/{object_name}",
+                    "type": "text",
+                }
+            }
 
 
+            # path object trong bucket
+            object_path = (
+                f"{PROCESSED_PREFIX}"
+                f"{doc_id}/"
+                f"chunk_{idx}.json"
+            )
 
+            upload_json_to_minio(
+                bucket=MAIN_BUCKET,
+                object_name=object_path,
+                data=record,
+            )
+
+            print(f"Uploaded: {object_path}")
+
+            # tránh rate limit
+            time.sleep(1.2)
+
+        print(f"DONE: {doc_id}")
 
