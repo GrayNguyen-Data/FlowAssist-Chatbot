@@ -62,9 +62,9 @@ def upload_raw_data(client: Minio, base_dir: Path):
 
         print(f"Uploaded: {object_name}")
 
-# ===== Entry point =====
-def main():
-    client = create_minio_client()
-    check_bucket(client, MINIO_BUCKET_NAME)
-    upload_raw_data(client, RAW_DATA_DIR)
-    print("✅ Upload raw_data hoàn tất")
+# # ===== Entry point =====
+# def main():
+#     client = create_minio_client()
+#     check_bucket(client, MINIO_BUCKET_NAME)
+#     upload_raw_data(client, RAW_DATA_DIR)
+#     print("✅ Upload raw_data hoàn tất")

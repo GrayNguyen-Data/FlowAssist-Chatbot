@@ -30,21 +30,35 @@ print(f"TiDB Database: {tidb_database}")
 database_url = f"mysql+pymysql://{tidb_user}:{tidb_password}@{tidb_host}:{tidb_port}/{tidb_database}?ssl_verify_cert=false"
 
 
+def get_tidb_engine():
+    """
+    Return TiDB engine để dùng ở nơi khác
+    """
+    engine = create_engine(
+        database_url,
+        pool_pre_ping=True,
+        connect_args={"read_timeout": tidb_timeout, "write_timeout": tidb_timeout}
+    )
+    return engine
+
+
 def connect_tidb():
+    """
+    Test connection
+    """
     print("Connecting to TiDB...")
-    # Create engine
     try:
-        engine = create_engine(
-            database_url,
-            pool_pre_ping=True,
-            connect_args={"read_timeout": tidb_timeout, "write_timeout": tidb_timeout}
-        )
+        engine = get_tidb_engine()
         
         with engine.connect() as conn:
             result = conn.execute(text("SELECT 1"))
             print(f"CONNECT TiDB THÀNH CÔNG: {result.scalar()}")
             print(f"Host: {tidb_host}:{tidb_port}")
             print(f"Database: {tidb_database}")
+        
+        return engine
+        
     except Exception as e:
         print(f"CONNECT FAIL")
         print(f"Error: {e}")
+        return None

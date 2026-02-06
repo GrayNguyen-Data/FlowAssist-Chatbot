@@ -12,7 +12,7 @@ from langchain_core.output_parsers import StrOutputParser
 # =========================
 # PROJECT UTILS
 # =========================
-from loader import get_raw_data_from_minio
+from loader import get_data_from_minio
 from core.setting_loader import load_settings
 
 # ======================================================
@@ -105,7 +105,7 @@ def upload_json_to_minio(bucket: str, object_name: str, data: dict):
 # MAIN PIPELINE: PROCESS ALL PDF
 # ======================================================
 def process_all_pdfs():
-    for object_name, file_buffer in get_raw_data_from_minio(RAW_PREFIX):
+    for object_name, file_buffer in get_data_from_minio(RAW_PREFIX):
 
         # chỉ xử lý PDF
         if not object_name.lower().endswith(".pdf"):

@@ -24,7 +24,7 @@ def create_minio_client() ->Minio:
     )
 
 # get data 
-def get_raw_data_from_minio(
+def get_data_from_minio(
         prefix: str = "raw_data/", # Thư mục logic trong bucket (pdf, jsson,...)
         stream_chunk_size: int = 64*1024, # 64KB -> đọc mỗi lần 64KB để tránh tràn ram
 ) -> Iterator[Tuple[str, BytesIO]]: # trả về tuple gồm tên file và nội dung dạng ByteIO
