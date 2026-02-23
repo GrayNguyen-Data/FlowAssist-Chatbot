@@ -53,3 +53,5 @@ def create_tables():
 
         print("tables ready\n")
 
+if __name__ == "__main__":
+    create_tables()
