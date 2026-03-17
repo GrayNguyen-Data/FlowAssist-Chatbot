@@ -15,41 +15,20 @@ class RetrievalPolicyService:
             "thank you",
             "bye",
             "tạm biệt",
+            "good morning",
+            "good night",
+            "chúc ngủ ngon",
         ]
 
-        self.knowledge_patterns = [
-            "flowassist",
-            "hệ thống",
-            "chatbot",
-            "rag",
-            "redis",
-            "tidb",
-            "minio",
-            "api",
-            "backend",
-            "ticket",
-            "history",
-            "mcp",
-            "tài liệu",
-            "quy trình",
-            "hướng dẫn",
-            "cấu trúc",
-            "kiến trúc",
-            "solf world", 
-        ]
-
-        self.question_markers = [
-            "là gì",
-            "như thế nào",
-            "ở đâu",
-            "bao nhiêu",
-            "khi nào",
-            "tại sao",
-            "vì sao",
-            "làm sao",
-            "thế nào",
-            "giải thích",
-            "hãy cho tôi biết",
+        self.follow_up_markers = [
+            "còn",
+            "thế còn",
+            "vậy thì",
+            "cái đó",
+            "phần đó",
+            "chi tiết hơn",
+            "nói rõ hơn",
+            "giải thích thêm",
         ]
 
     def should_retrieve(
@@ -66,26 +45,8 @@ class RetrievalPolicyService:
         if any(pattern in text for pattern in self.small_talk_patterns):
             return False
 
-        if any(pattern in text for pattern in self.knowledge_patterns):
-            return True
-
-        if any(marker in text for marker in self.question_markers):
-            return True
-
-        if "?" in text:
-            return True
-
-        follow_up_markers = [
-            "còn",
-            "thế còn",
-            "vậy thì",
-            "cái đó",
-            "phần đó",
-            "chi tiết hơn",
-            "nói rõ hơn",
-            "giải thích thêm",
-        ]
-        if any(marker in text for marker in follow_up_markers):
+        if any(marker in text for marker in self.follow_up_markers):
             return len(memory_messages) > 0
 
-        return False
+        # Với chatbot tri thức, mặc định nên retrieve
+        return True
