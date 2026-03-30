@@ -1,4 +1,5 @@
 import json
+from functools import lru_cache
 from typing import List
 
 from langchain_core.embeddings import Embeddings
@@ -8,10 +9,6 @@ from app.core.config import settings
 
 
 class SentenceTransformerEmbeddings(Embeddings):
-    """
-    LangChain-compatible wrapper for SentenceTransformer embeddings.
-    """
-
     def __init__(self, model_name: str):
         self.model_name = model_name
         self.model = SentenceTransformer(model_name)
@@ -25,6 +22,7 @@ class SentenceTransformerEmbeddings(Embeddings):
         return embedding.tolist()
 
 
+@lru_cache(maxsize=1)
 def get_embedder() -> SentenceTransformerEmbeddings:
     return SentenceTransformerEmbeddings(model_name=settings.EMBEDDING_MODEL)
 
@@ -38,4 +36,4 @@ class EmbeddingService:
 
     async def embed_text_as_json(self, text: str) -> str:
         vector = await self.embed_text(text)
-        return json.dumps(vector, ensure_ascii=False)
+        return json.dumps(vector, ensure_ascii=False),5;5

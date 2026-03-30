@@ -186,8 +186,8 @@ class IngestionService:
         file_name: str,
         data: bytes,
         content_type: str | None = None,
-        chunk_size: int = 500,
-        chunk_overlap: int = 50,
+        chunk_size: int = 700,
+        chunk_overlap: int = 120,
         extra_metadata: dict | None = None,
     ):
         content = self._extract_text_from_bytes(

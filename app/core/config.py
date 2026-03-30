@@ -39,13 +39,13 @@ class Settings(BaseSettings):
     REDIS_MEMORY_TTL_SECONDS: int = 3600
     REDIS_MAX_MEMORY_MESSAGES: int = 10
 
-    RETRIEVAL_TOP_K: int = 5
+    RETRIEVAL_TOP_K: int = 8
     RETRIEVAL_SCORE_THRESHOLD: float = 0.0
 
     LLM_PROVIDER: str = "groq"
     LLM_MODEL_NAME: str = "llama-3.1-8b-instant"
     LLM_BASE_URL: str | None = None
-    LLM_TEMPERATURE: float = 0.2
+    LLM_TEMPERATURE: float = 0.1
     LLM_MAX_TOKENS: int | None = None
     LLM_TIMEOUT: int = 60
 
