@@ -36,4 +36,4 @@ class EmbeddingService:
 
     async def embed_text_as_json(self, text: str) -> str:
         vector = await self.embed_text(text)
-        return json.dumps(vector, ensure_ascii=False),5;5
+        return json.dumps(vector, ensure_ascii=False)
