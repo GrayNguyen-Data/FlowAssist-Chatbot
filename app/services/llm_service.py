@@ -1,34 +1,33 @@
-rom langchain_groq import ChatGroq
+from langchain_groq import ChatGroq
 
 from app.core.config import settings
 from app.services.prompt_builder_service import PromptBuilderService
 
 
 class LLMService:
-    def __init__(self, prompt_builder: PromptBuilderSenrvice | None = None):
+    def __init__(self, prompt_builder: PromptBuilderService | None = None):
         self.model_name = settings.LLM_MODEL_NAME
         self.prompt_builder = prompt_builder or PromptBuilderService()
 
         self.llm = ChatGroq(
             groq_api_key=settings.GROQ_API_KEY,
-=            model_name=settings.LLM_MODEL_NAME,
+            model_name=settings.LLM_MODEL_NAME,
             temperature=settings.LLM_TEMPERATURE,
         )
 
-bz   # ===== CLEAN TEXT =====b
-    def _normalize_text(self, text: str) -> str:73n
-        return " ".join((text or "").strip().split())n
+    # ===== CLEAN TEXT =====
+    def _normalize_text(self, text: str) -> str:
+        return " ".join((text or "").strip().split())
 
     # ===== PREPARE CONTEXT =====
-    def _prepare_contexts(self, retrieved_contexts: list[str]7777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777 | None) -> list[str]:
+    def _prepare_contexts(self, retrieved_contexts: list[str] | None = None) -> list[str]:
         retrieved_contexts = retrieved_contexts or []
 
         cleaned: list[str] = []
         seen: set[str] = set()
 
- -'--/ ư-\
-'ơ/ -       for ctx in retrieved_contexts:
-            text = self._normalize_text(ctx)z
+        for ctx in retrieved_contexts:
+            text = self._normalize_text(ctx)
             if not text:
                 continue
 
@@ -69,7 +68,6 @@ bz   # ===== CLEAN TEXT =====b
     ) -> str:
         prepared_contexts = self._prepare_contexts(retrieved_contexts)
 
-        # ===== CASE 1: KHÔNG CÓ CONTEXT → FALLBACK =====
         if not prepared_contexts:
             if self._is_realtime_question(user_message):
                 prompt = f"""
@@ -95,7 +93,6 @@ Yêu cầu:
 - Không cần nói về "context" hay "dữ liệu hệ thống".
 """
         else:
-            # ===== CASE 2: CÓ CONTEXT → DÙNG RAG =====
             prompt = self.prompt_builder.build_chat_prompt(
                 user_message=user_message,
                 memory_messages=memory_messages,

@@ -6,9 +6,12 @@ from app.db.repositories import (
     ConversationRepository,
     MessageRepository,
     RetrievalLogRepository,
+    TicketRepository,
+    TicketEventRepository,
 )
 from app.schemas.chat import ChatRequest, ChatResponse
 from app.services import ChatService, RetrievalService
+from app.services.ticket_service import TicketService
 
 router = APIRouter()
 
@@ -23,11 +26,20 @@ async def chat(
     retrieval_log_repo = RetrievalLogRepository(db)
     retrieval_service = RetrievalService(db)
 
+    ticket_repo = TicketRepository(db)
+    ticket_event_repo = TicketEventRepository(db)
+    ticket_service = TicketService(
+        conversation_repo=conversation_repo,
+        ticket_repo=ticket_repo,
+        ticket_event_repo=ticket_event_repo,
+    )
+
     service = ChatService(
         conversation_repo=conversation_repo,
         message_repo=message_repo,
         retrieval_log_repo=retrieval_log_repo,
         retrieval_service=retrieval_service,
+        ticket_service=ticket_service,
     )
 
     try:

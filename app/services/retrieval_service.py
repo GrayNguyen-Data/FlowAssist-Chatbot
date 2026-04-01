@@ -8,7 +8,6 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.config import settings
 from app.services.embedding_service import get_embedder
 
-
 class RetrievalService:
     def __init__(self, db: AsyncSession):
         self.db = db
